@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Ganhos Unity/Fab</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .calculator {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .section-title {
+            margin-top: 20px;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        .info-box {
+            background-color: #e8f5e9;
+            border-radius: 5px;
+            padding: 8px;
+            margin: 15px 0;
+            font-size: 13px;
+            border-left: 4px solid #4CAF50;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result-total {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f1f8e9;
+            border-radius: 5px;
+            border-left: 5px solid #4CAF50;
+            text-align: center;
+        }
+        .result-total h2 {
+            margin-top: 0;
+            color: #2e7d32;
+            font-size: 18px;
+        }
+        .result-total .total-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2e7d32;
+            margin: 10px 0;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 12px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            border-left: 3px solid #4CAF50;
+            font-size: 13px;
+        }
+        .result .section-title {
+            font-size: 14px;
+            margin-top: 0;
+            margin-bottom: 8px;
+        }
+        .result p {
+            margin: 4px 0;
+        }
+        .mb-10 {
+            margin-bottom: 10px;
+        }
+        .cambio-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .cambio-input {
+            flex: 1;
+        }
+        .atualizar-btn {
+            background-color: #555;
+            padding: 8px 12px;
+            height: 36px;
+        }
+        .status-msg {
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        .success {
+            color: #4CAF50;
+        }
+        .warning {
+            color: #ff9800;
+        }
+        .fee-info {
+            font-weight: bold;
+            color: #e53935;
+        }
+        .details-toggle {
+            background: none;
+            border: none;
+            color: #555;
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: 12px;
+            margin-top: 5px;
+            width: auto;
+            padding: 0;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <h1>Calculadora de Ganhos Unity/Fab</h1>
+        
+        <div class="section-title">Unity Asset Store</div>
+        <div class="input-group">
+            <label for="unity-valor">Valor Líquido Unity (USD):</label>
+            <input type="number" id="unity-valor" placeholder="Valor líquido em USD">
+        </div>
+        
+        <div class="section-title">Fab</div>
+        <div class="input-group">
+            <label for="fab-valor">Valor Bruto Fab (USD):</label>
+            <input type="number" id="fab-valor" placeholder="Valor bruto em USD">
+        </div>
+        
+        <div class="section-title">Taxa de Câmbio</div>
+        <div class="cambio-area">
+            <div class="cambio-input">
+                <label for="cambio-manual">USD → BRL:</label>
+                <input type="number" id="cambio-manual" value="5.20" step="0.01" min="0">
+                <div class="status-msg" id="cambio-status"></div>
+            </div>
+            <button class="atualizar-btn" onclick="obterTaxaCambio()">Atualizar</button>
+        </div>
+        
+        <div class="info-box">
+            <p><strong>Taxas aplicadas:</strong> Fab <span class="fee-info">12%</span> | Transferência internacional <span class="fee-info">2%</span></p>
+        </div>
+        
+        <button onclick="calcular()">Calcular</button>
+        
+        <!-- Resultado Total (Soma) -->
+        <div class="result-total" id="resultado-total" style="display:none">
+            <h2>Valor Total Final</h2>
+            <div class="total-value">
+                <div>USD: <span id="total-usd"></span></div>
+                <div>BRL: <span id="total-brl"></span></div>
+            </div>
+            <button class="details-toggle" onclick="toggleDetalhes()">Ver detalhes</button>
+        </div>
+        
+        <!-- Seção de Detalhes -->
+        <div id="detalhes-container" class="hidden">
+            <div class="result" id="resultado-unity" style="display:none">
+                <div class="section-title">Resultados Unity</div>
+                <p><strong>Valor Líquido (USD):</strong> <span id="unity-usd"></span></p>
+                <p><strong>Taxa de Transferência (USD):</strong> <span id="unity-taxa-transferencia"></span></p>
+                <p><strong>Valor Final (USD):</strong> <span id="unity-final-usd"></span></p>
+                <p><strong>Valor Final (BRL):</strong> <span id="unity-brl"></span></p>
+            </div>
+            
+            <div class="result" id="resultado-fab" style="display:none">
+                <div class="section-title">Resultados Fab</div>
+                <p><strong>Valor Bruto (USD):</strong> <span id="fab-bruto-usd"></span></p>
+                <p><strong>Taxa Fab 12% (USD):</strong> <span id="fab-taxa-usd"></span></p>
+                <p><strong>Valor Após Taxa Fab (USD):</strong> <span id="fab-pos-taxa-usd"></span></p>
+                <p><strong>Taxa de Transferência 2% (USD):</strong> <span id="fab-taxa-transferencia"></span></p>
+                <p><strong>Valor Final (USD):</strong> <span id="fab-liquido-usd"></span></p>
+                <p><strong>Valor Final (BRL):</strong> <span id="fab-liquido-brl"></span></p>
+            </div>
+            
+            <button class="details-toggle" onclick="toggleDetalhes()">Ocultar detalhes</button>
+        </div>
+    </div>
+
+    <script>
+        // Dados fixos de backup para quando a API não estiver disponível
+        const taxasBackup = {
+            "BRL": 5.20,  // Valor de backup para o Real Brasileiro
+            "lastUpdated": "Valor offline"
+        };
+        
+        // Constantes das taxas
+        const TAXA_FAB = 12; // 12%
+        const TAXA_TRANSFERENCIA = 2; // 2%
+        
+        // Função para obter a taxa de câmbio atual
+        async function obterTaxaCambio() {
+            const statusEl = document.getElementById('cambio-status');
+            
+            // Tentativa com API livre de CORS (1)
+            try {
+                statusEl.textContent = "Atualizando taxa de câmbio...";
+                statusEl.className = "status-msg";
+                
+                // Usando API com proxy CORS Anywhere
+                const response = await fetch('https://api.exchangerate.host/latest?base=USD');
+                const data = await response.json();
+                
+                if (data && data.rates && data.rates.BRL) {
+                    const taxa = data.rates.BRL;
+                    document.getElementById('cambio-manual').value = taxa.toFixed(2);
+                    statusEl.textContent = `Atualizado: ${new Date().toLocaleTimeString()}`;
+                    statusEl.className = "status-msg success";
+                    return;
+                } else {
+                    throw new Error("Dados inválidos");
+                }
+            } catch (error1) {
+                console.log("Primeira API falhou, tentando alternativa...");
+                
+                // Tentativa com API alternativa (2)
+                try {
+                    const response = await fetch('https://open.er-api.com/v6/latest/USD');
+                    const data = await response.json();
+                    
+                    if (data && data.rates && data.rates.BRL) {
+                        const taxa = data.rates.BRL;
+                        document.getElementById('cambio-manual').value = taxa.toFixed(2);
+                        statusEl.textContent = `Atualizado: ${new Date().toLocaleTimeString()}`;
+                        statusEl.className = "status-msg success";
+                        return;
+                    } else {
+                        throw new Error("Dados inválidos");
+                    }
+                } catch (error2) {
+                    console.log("Segunda API falhou, usando valores de backup");
+                    
+                    // Usar valores de backup pré-definidos
+                    document.getElementById('cambio-manual').value = taxasBackup.BRL.toFixed(2);
+                    statusEl.textContent = "Usando valor offline. Verifique sua conexão ou ajuste manualmente.";
+                    statusEl.className = "status-msg warning";
+                }
+            }
+        }
+        
+        // Função para alternar a exibição dos detalhes
+        function toggleDetalhes() {
+            const detalhesContainer = document.getElementById('detalhes-container');
+            if (detalhesContainer.classList.contains('hidden')) {
+                detalhesContainer.classList.remove('hidden');
+            } else {
+                detalhesContainer.classList.add('hidden');
+            }
+        }
+        
+        // Tentar obter a taxa na inicialização
+        window.addEventListener('DOMContentLoaded', () => {
+            obterTaxaCambio();
+        });
+        
+        function calcular() {
+            // Valores Unity
+            const valorUnity = parseFloat(document.getElementById('unity-valor').value) || 0;
+            
+            // Valores Fab
+            const valorFab = parseFloat(document.getElementById('fab-valor').value) || 0;
+            
+            // Taxa de câmbio
+            const taxaCambio = parseFloat(document.getElementById('cambio-manual').value) || 5.20;
+            
+            // Cálculos Unity
+            const taxaTransferenciaUnity = valorUnity * (TAXA_TRANSFERENCIA / 100);
+            const valorFinalUnityUSD = valorUnity - taxaTransferenciaUnity;
+            const valorFinalUnityBRL = valorFinalUnityUSD * taxaCambio;
+            
+            // Cálculos Fab
+            const taxaFabUSD = valorFab * (TAXA_FAB / 100);
+            const valorPosTaxaFabUSD = valorFab - taxaFabUSD;
+            const taxaTransferenciaFab = valorPosTaxaFabUSD * (TAXA_TRANSFERENCIA / 100);
+            const valorLiquidoFabUSD = valorPosTaxaFabUSD - taxaTransferenciaFab;
+            const valorLiquidoFabBRL = valorLiquidoFabUSD * taxaCambio;
+            
+            // Calcular totais
+            const totalUSD = valorFinalUnityUSD + valorLiquidoFabUSD;
+            const totalBRL = valorFinalUnityBRL + valorLiquidoFabBRL;
+            
+            // Mostrar resultado total
+            if (valorUnity > 0 || valorFab > 0) {
+                document.getElementById('total-usd').textContent = `$${totalUSD.toFixed(2)}`;
+                document.getElementById('total-brl').textContent = `R$${totalBRL.toFixed(2)}`;
+                document.getElementById('resultado-total').style.display = 'block';
+            } else {
+                document.getElementById('resultado-total').style.display = 'none';
+            }
+            
+            // Mostrar resultados Unity
+            if (valorUnity > 0) {
+                document.getElementById('unity-usd').textContent = `$${valorUnity.toFixed(2)}`;
+                document.getElementById('unity-taxa-transferencia').textContent = `$${taxaTransferenciaUnity.toFixed(2)}`;
+                document.getElementById('unity-final-usd').textContent = `$${valorFinalUnityUSD.toFixed(2)}`;
+                document.getElementById('unity-brl').textContent = `R$${valorFinalUnityBRL.toFixed(2)}`;
+                document.getElementById('resultado-unity').style.display = 'block';
+            } else {
+                document.getElementById('resultado-unity').style.display = 'none';
+            }
+            
+            // Mostrar resultados Fab
+            if (valorFab > 0) {
+                document.getElementById('fab-bruto-usd').textContent = `$${valorFab.toFixed(2)}`;
+                document.getElementById('fab-taxa-usd').textContent = `$${taxaFabUSD.toFixed(2)}`;
+                document.getElementById('fab-pos-taxa-usd').textContent = `$${valorPosTaxaFabUSD.toFixed(2)}`;
+                document.getElementById('fab-taxa-transferencia').textContent = `$${taxaTransferenciaFab.toFixed(2)}`;
+                document.getElementById('fab-liquido-usd').textContent = `$${valorLiquidoFabUSD.toFixed(2)}`;
+                document.getElementById('fab-liquido-brl').textContent = `R$${valorLiquidoFabBRL.toFixed(2)}`;
+                document.getElementById('resultado-fab').style.display = 'block';
+            } else {
+                document.getElementById('resultado-fab').style.display = 'none';
+            }
+            
+            // Esconde os detalhes por padrão quando calcula
+            document.getElementById('detalhes-container').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
