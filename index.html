@@ -3,297 +3,291 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Ganhos Unity/Fab</title>
+    <title>Calculadora Unity/Fab Pro</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            max-width: 600px;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            max-width: 500px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f0f2f5;
+            background-color: #f4f7f6;
+            color: #333;
         }
         .calculator {
             background-color: white;
-            border-radius: 12px;
+            border-radius: 16px;
             padding: 25px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
         }
         h1 {
             text-align: center;
-            color: #1a1a1a;
-            font-size: 22px;
-            margin-bottom: 25px;
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #1b5e20;
         }
         .section-title {
-            margin-top: 20px;
-            font-weight: bold;
+            font-weight: 700;
             color: #2e7d32;
-            border-bottom: 2px solid #e8f5e9;
-            padding-bottom: 5px;
-            margin-bottom: 15px;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 20px 0 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-title::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #e0e0e0;
         }
         .input-group {
             margin-bottom: 15px;
         }
         label {
             display: block;
-            margin-bottom: 6px;
+            margin-bottom: 5px;
+            font-size: 13px;
             font-weight: 600;
-            font-size: 14px;
-            color: #444;
         }
         input, select {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
             box-sizing: border-box;
-            font-size: 14px;
+            font-size: 15px;
+            transition: border 0.2s;
         }
-        input:focus, select:focus {
+        input:focus {
             border-color: #4CAF50;
             outline: none;
-            box-shadow: 0 0 5px rgba(76, 175, 80, 0.2);
         }
-        /* Container do Câmbio Corrigido */
         .cambio-container {
-            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
         }
         .cambio-row {
             display: flex;
-            gap: 10px;
-            align-items: center;
+            gap: 8px;
+            align-items: stretch;
         }
-        .extra-deduction-container {
-            background-color: #fff3f3;
-            padding: 10px;
-            border-radius: 6px;
-            margin-top: 10px;
-            border: 1px dashed #e53935;
-        }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            width: 100%;
-            font-size: 16px;
-            font-weight: bold;
-            margin-top: 20px;
-            transition: background 0.3s;
-        }
-        button:hover {
-            background-color: #439647;
+        .cambio-row input {
+            flex: 1;
         }
         .btn-refresh {
-            width: auto;
-            margin-top: 0;
-            padding: 10px 15px;
-            background-color: #555;
-            height: 38px; /* Mesma altura aproximada do input */
+            width: 50px;
+            background: #eee;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: background 0.2s;
         }
-        .result-total {
-            margin-top: 25px;
-            padding: 20px;
-            background-color: #e8f5e9;
+        .btn-refresh:hover { background: #e0e0e0; }
+
+        .extra-deduction {
+            background-color: #fff5f5;
+            padding: 12px;
             border-radius: 8px;
-            text-align: center;
-        }
-        .total-value {
-            font-size: 28px;
-            font-weight: 800;
-            color: #2e7d32;
-            margin: 10px 0;
-        }
-        .result {
-            margin-top: 15px;
-            padding: 15px;
-            background-color: #ffffff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 13px;
-        }
-        .status-msg {
-            font-size: 11px;
-            margin-top: 6px;
-            min-height: 14px;
-        }
-        .success { color: #4CAF50; }
-        .warning { color: #ff9800; }
-        .hidden { display: none; }
-        .details-toggle {
-            background: none;
-            border: none;
-            color: #666;
-            text-decoration: underline;
-            cursor: pointer;
-            font-size: 12px;
+            border: 1px dashed #ffcdd2;
             margin-top: 10px;
         }
+        .help-text {
+            font-size: 11px;
+            color: #c62828;
+            margin-top: 4px;
+            font-weight: 600;
+        }
+        button.main-btn {
+            background-color: #2e7d32;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            font-weight: 700;
+            margin-top: 25px;
+            box-shadow: 0 4px 10px rgba(46, 125, 50, 0.2);
+        }
+        button.main-btn:active { transform: translateY(1px); }
+
+        .result-card {
+            margin-top: 25px;
+            padding: 20px;
+            background: linear-gradient(135deg, #2e7d32, #1b5e20);
+            color: white;
+            border-radius: 12px;
+            text-align: center;
+            display: none;
+        }
+        .total-brl { font-size: 32px; font-weight: 800; margin: 5px 0; }
+        .total-usd { font-size: 16px; opacity: 0.9; }
+
+        .details-box {
+            margin-top: 15px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            padding: 15px;
+            font-size: 13px;
+            display: none;
+        }
+        .detail-line {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
+        }
+        .hidden { display: none; }
+        .success-text { color: #4CAF50; font-size: 11px; margin-top: 5px; }
     </style>
 </head>
 <body>
-    <div class="calculator">
-        <h1>Calculadora Unity/Fab</h1>
-        
-        <div class="section-title">Unity Asset Store</div>
-        <div class="input-group">
-            <label for="unity-tipo">Estado do Valor:</label>
-            <select id="unity-tipo" onchange="toggleExtraUnity()">
-                <option value="bruto">Valor Bruto</option>
-                <option value="liquido" selected>Valor Líquido</option>
-            </select>
-        </div>
-        
-        <div class="input-group">
-            <label for="unity-valor">Valor USD:</label>
-            <input type="number" id="unity-valor" placeholder="0.00">
-        </div>
 
-        <div id="unity-extra-field" class="input-group extra-deduction-container hidden">
-            <label for="unity-deducao-especifica">Subtrair Valor (Taxas fixas/WHT):</label>
-            <input type="number" id="unity-deducao-especifica" placeholder="0.00">
-        </div>
-        
-        <div class="section-title">Fab (Epic Games)</div>
-        <div class="input-group">
-            <label for="fab-valor">Valor Bruto Fab (USD):</label>
-            <input type="number" id="fab-valor" placeholder="0.00">
-        </div>
-        
-        <div class="section-title">Câmbio</div>
-        <div class="cambio-container">
-            <label for="cambio-manual">USD → BRL:</label>
-            <div class="cambio-row">
-                <input type="number" id="cambio-manual" value="5.20" step="0.01">
-                <button class="btn-refresh" onclick="obterTaxaCambio()" title="Atualizar Câmbio">🔄</button>
-            </div>
-            <div class="status-msg" id="cambio-status"></div>
-        </div>
-        
-        <button onclick="calcular()">CALCULAR GANHOS</button>
-        
-        <div class="result-total" id="resultado-total" style="display:none">
-            <div style="font-size: 14px; color: #666;">Total Estimado</div>
-            <div class="total-value" id="total-brl">R$ 0,00</div>
-            <div style="font-weight: bold; color: #444;" id="total-usd">$ 0.00</div>
-            <button class="details-toggle" onclick="toggleDetalhes()">Ver demonstrativo detalhado</button>
-        </div>
-        
-        <div id="detalhes-container" class="hidden">
-            <div class="result" id="res-unity" style="display:none"></div>
-            <div class="result" id="res-fab" style="display:none"></div>
-        </div>
+<div class="calculator">
+    <h1>Calculadora Unity/Fab</h1>
+
+    <div class="section-title">Unity Asset Store</div>
+    <div class="input-group">
+        <label>Estado do Valor:</label>
+        <select id="u-tipo" onchange="toggleExtra()">
+            <option value="liquido">Valor Líquido</option>
+            <option value="bruto">Valor Bruto</option>
+        </select>
+    </div>
+    <div class="input-group">
+        <label>Valor em USD:</label>
+        <input type="number" id="u-valor" placeholder="0.00" step="0.01">
     </div>
 
-    <script>
-        const TAXA_UNITY_STORE = 0.30; 
-        const TAXA_FAB = 0.12;
-        const TAXA_TRANSFERENCIA = 0.02;
+    <div id="u-extra-container" class="extra-deduction hidden">
+        <label>Subtrair Valor (USD):</label>
+        <input type="number" id="u-extra" placeholder="0.00" step="0.01">
+        <div class="help-text">O valor acima será subtraído ANTES dos 30% da Unity.</div>
+    </div>
 
-        function toggleExtraUnity() {
-            const tipo = document.getElementById('unity-tipo').value;
-            const extraField = document.getElementById('unity-extra-field');
-            if (tipo === 'bruto') {
-                extraField.classList.remove('hidden');
-            } else {
-                extraField.classList.add('hidden');
-                document.getElementById('unity-deducao-especifica').value = '';
-            }
+    <div class="section-title">Fab (Epic Games)</div>
+    <div class="input-group">
+        <label>Valor Bruto na Fab (USD):</label>
+        <input type="number" id="f-valor" placeholder="0.00" step="0.01">
+    </div>
+
+    <div class="section-title">Configurações de Câmbio</div>
+    <div class="cambio-container">
+        <label>Cotação USD → BRL:</label>
+        <div class="cambio-row">
+            <input type="number" id="cambio" value="5.20" step="0.01">
+            <button class="btn-refresh" onclick="getExchange()" title="Atualizar Câmbio">🔄</button>
+        </div>
+        <div id="cambio-status" class="success-text"></div>
+    </div>
+
+    <button class="main-btn" onclick="calculate()">CALCULAR RECEBIMENTO</button>
+
+    <div id="result-card" class="result-card">
+        <div style="font-size: 12px; text-transform: uppercase;">Total a Receber</div>
+        <div class="total-brl" id="res-brl">R$ 0,00</div>
+        <div class="total-usd" id="res-usd">$ 0.00 USD</div>
+        <div style="margin-top:10px; font-size: 11px; cursor:pointer; text-decoration: underline;" onclick="toggleDetails()">Ver demonstrativo detalhado</div>
+    </div>
+
+    <div id="details-box" class="details-box">
+        <div id="details-content"></div>
+    </div>
+</div>
+
+<script>
+    function toggleExtra() {
+        const isBruto = document.getElementById('u-tipo').value === 'bruto';
+        document.getElementById('u-extra-container').classList.toggle('hidden', !isBruto);
+    }
+
+    async function getExchange() {
+        const status = document.getElementById('cambio-status');
+        status.textContent = "Buscando...";
+        try {
+            const res = await fetch('https://open.er-api.com/v6/latest/USD');
+            const data = await res.json();
+            document.getElementById('cambio').value = data.rates.BRL.toFixed(2);
+            status.textContent = "Cotação atualizada em " + new Date().toLocaleTimeString();
+        } catch (e) {
+            status.textContent = "Erro ao atualizar. Insira manualmente.";
         }
+    }
 
-        async function obterTaxaCambio() {
-            const statusEl = document.getElementById('cambio-status');
-            const btn = document.querySelector('.btn-refresh');
-            try {
-                btn.textContent = "...";
-                statusEl.textContent = "Buscando cotação atualizada...";
-                const response = await fetch('https://open.er-api.com/v6/latest/USD');
-                const data = await response.json();
-                if (data && data.rates.BRL) {
-                    document.getElementById('cambio-manual').value = data.rates.BRL.toFixed(2);
-                    statusEl.textContent = "Taxa atualizada via Open ER API";
-                    statusEl.className = "status-msg success";
-                }
-            } catch (e) {
-                statusEl.textContent = "Erro ao conectar. Insira o valor manualmente.";
-                statusEl.className = "status-msg warning";
-            } finally {
-                btn.textContent = "🔄";
-            }
+    function toggleDetails() {
+        const box = document.getElementById('details-box');
+        box.style.display = box.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function calculate() {
+        const cambio = parseFloat(document.getElementById('cambio').value) || 0;
+        
+        // --- LÓGICA UNITY ---
+        const uInput = parseFloat(document.getElementById('u-valor').value) || 0;
+        const uTipo = document.getElementById('u-tipo').value;
+        const uExtra = parseFloat(document.getElementById('u-extra').value) || 0;
+        
+        let uBaseAposDeducao = uInput;
+        let uStoreFee = 0;
+
+        if (uTipo === 'bruto' && uInput > 0) {
+            // 1. Subtrai o valor específico primeiro
+            uBaseAposDeducao = uInput - uExtra;
+            // 2. Calcula os 30% sobre o que sobrou
+            uStoreFee = uBaseAposDeducao * 0.30;
         }
+        
+        // 3. Valor após a loja
+        let uPosStore = uBaseAposDeducao - uStoreFee;
+        // 4. Taxa de transferência de 2%
+        let uTransfFee = uPosStore * 0.02;
+        let uFinalUSD = Math.max(0, uPosStore - uTransfFee);
 
-        function toggleDetalhes() {
-            document.getElementById('detalhes-container').classList.toggle('hidden');
+        // --- LÓGICA FAB ---
+        const fVal = parseFloat(document.getElementById('f-valor').value) || 0;
+        let fStoreFee = fVal * 0.12;
+        let fPosStore = fVal - fStoreFee;
+        let fTransfFee = fPosStore * 0.02;
+        let fFinalUSD = Math.max(0, fPosStore - fTransfFee);
+
+        // --- TOTAIS ---
+        const totalUSD = uFinalUSD + fFinalUSD;
+        const totalBRL = totalUSD * cambio;
+
+        // --- EXIBIÇÃO ---
+        document.getElementById('result-card').style.display = 'block';
+        document.getElementById('res-brl').textContent = "R$ " + totalBRL.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        document.getElementById('res-usd').textContent = "$ " + totalUSD.toFixed(2) + " USD";
+
+        let html = `<strong>DEMONSTRATIVO:</strong><br><br>`;
+        if(uInput > 0) {
+            html += `<b>Unity Store:</b><br>
+            <div class="detail-line"><span>Entrada Bruta</span> <span>$${uInput.toFixed(2)}</span></div>
+            ${uExtra > 0 ? `<div class="detail-line"><span>Dedução Pré-Taxa</span> <span style="color:red">-$${uExtra.toFixed(2)}</span></div>` : ''}
+            ${uStoreFee > 0 ? `<div class="detail-line"><span>Comissão Unity (30%)</span> <span style="color:red">-$${uStoreFee.toFixed(2)}</span></div>` : ''}
+            <div class="detail-line"><span>Transferência (2%)</span> <span style="color:red">-$${uTransfFee.toFixed(2)}</span></div>
+            <div class="detail-line"><b>Líquido Unity</b> <b>$${uFinalUSD.toFixed(2)}</b></div><br>`;
         }
-
-        function calcular() {
-            const cambio = parseFloat(document.getElementById('cambio-manual').value) || 1;
-            
-            // Unity Logic
-            const uInput = parseFloat(document.getElementById('unity-valor').value) || 0;
-            const uTipo = document.getElementById('unity-tipo').value;
-            const uDeducao = parseFloat(document.getElementById('unity-deducao-especifica').value) || 0;
-            
-            let uBase = uInput;
-            let uStoreFee = 0;
-            
-            if (uTipo === 'bruto' && uInput > 0) {
-                uStoreFee = uInput * TAXA_UNITY_STORE;
-                uBase = uInput - uStoreFee - uDeducao;
-            }
-            
-            const uTransfFee = uBase * TAXA_TRANSFERENCIA;
-            const uLiquidoUSD = Math.max(0, uBase - uTransfFee);
-
-            // Fab Logic
-            const fInput = parseFloat(document.getElementById('fab-valor').value) || 0;
-            const fStoreFee = fInput * TAXA_FAB;
-            const fBase = fInput - fStoreFee;
-            const fTransfFee = fBase * TAXA_TRANSFERENCIA;
-            const fLiquidoUSD = Math.max(0, fBase - fTransfFee);
-
-            // Totals
-            const totalUSD = uLiquidoUSD + fLiquidoUSD;
-            const totalBRL = totalUSD * cambio;
-
-            // Display
-            if (uInput > 0 || fInput > 0) {
-                document.getElementById('resultado-total').style.display = 'block';
-                document.getElementById('total-brl').textContent = `R$ ${totalBRL.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-                document.getElementById('total-usd').textContent = `$ ${totalUSD.toFixed(2)} USD`;
-
-                // Details Unity
-                const resU = document.getElementById('res-unity');
-                if (uInput > 0) {
-                    resU.style.display = 'block';
-                    resU.innerHTML = `<strong>Detalhes Unity:</strong><br>
-                        Entrada: $${uInput.toFixed(2)}<br>
-                        ${uStoreFee > 0 ? `Taxa Store (30%): -$${uStoreFee.toFixed(2)}<br>` : ''}
-                        ${uDeducao > 0 ? `Dedução Extra: -$${uDeducao.toFixed(2)}<br>` : ''}
-                        Taxa Transferência (2%): -$${uTransfFee.toFixed(2)}<br>
-                        <strong>Líquido Unity: $${uLiquidoUSD.toFixed(2)}</strong>`;
-                } else { resU.style.display = 'none'; }
-
-                // Details Fab
-                const resF = document.getElementById('res-fab');
-                if (fInput > 0) {
-                    resF.style.display = 'block';
-                    resF.innerHTML = `<strong>Detalhes Fab:</strong><br>
-                        Bruto: $${fInput.toFixed(2)}<br>
-                        Taxa Fab (12%): -$${fStoreFee.toFixed(2)}<br>
-                        Taxa Transferência (2%): -$${fTransfFee.toFixed(2)}<br>
-                        <strong>Líquido Fab: $${fLiquidoUSD.toFixed(2)}</strong>`;
-                } else { resF.style.display = 'none'; }
-            }
+        if(fVal > 0) {
+            html += `<b>Fab:</b><br>
+            <div class="detail-line"><span>Entrada Bruta</span> <span>$${fVal.toFixed(2)}</span></div>
+            <div class="detail-line"><span>Taxa Fab (12%)</span> <span style="color:red">-$${fStoreFee.toFixed(2)}</span></div>
+            <div class="detail-line"><span>Transferência (2%)</span> <span style="color:red">-$${fTransfFee.toFixed(2)}</span></div>
+            <div class="detail-line"><b>Líquido Fab</b> <b>$${fFinalUSD.toFixed(2)}</b></div>`;
         }
+        document.getElementById('details-content').innerHTML = html;
+    }
 
-        window.onload = obterTaxaCambio;
-    </script>
+    window.onload = getExchange;
+</script>
+
 </body>
 </html>
